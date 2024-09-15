@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ark Guessing Game</title>
+  <style>
+    body {
+      text-align: center;
+    }
+    #map-container, #screenshot-container {
+      display: inline-block;
+      vertical-align: top;
+    }
+    #map, #screenshot {
+      border: 2px solid black;
+    }
+    #guess {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Guess the Ark Location</h1>
+  <p>Enter the coordinates (0-100 range) based on the map:</p>
+  
+  <!-- Input fields for X and Y coordinates -->
+  <label for="x-coordinate">X (0-100):</label>
+  <input type="number" id="x-coordinate" min="0" max="100">
+  
+  <label for="y-coordinate">Y (0-100):</label>
+  <input type="number" id="y-coordinate" min="0" max="100">
+  
+  <button id="submit">Submit Guess</button>
+
+  <!-- Containers for the Map and Screenshot -->
+  <div id="map-container">
+    <h3>Map</h3>
+    <img id="map" src="ark_map.jpg" alt="Ark Map" width="600" height="400">
+  </div>
+
+  <div id="screenshot-container">
+    <h3>Screenshot</h3>
+    <img id="screenshot" src="ig.jpg" alt="Ark Screenshot" width="600" height="400">
+  </div>
+
+  <div id="guess-marker-container">
+    <div id="guess"></div>
+  </div>
+
+  <p id="distance"></p>
+  <p id="score"></p>
+
+  <script>
+    // Set the actual location to { x: 23, y: 68 }
+    const actualLocation = { x: 23, y: 68 };
+
+    const map = document.getElementById('map');
+    const guessMarker = document.getElementById('guess');
+    const distanceText = document.getElementById('distance');
+    const scoreText = document.getElementById('score');
+
+    const xInput = document.getElementById('x-coordinate');
+    const yInput = document.getElementById('y-coordinate');
+    const submitButton = document.getElementById('submit');
+
+    // Hide the guess marker initially
+    guessMarker.style.display = 'none';
+
+    // Add event listener to the Submit button
+    submitButton.addEventListener('click', function() {
+      // Get user input for X and Y coordinates
+      const x = parseFloat(xInput.value);
+      const y = parseFloat(yInput.value);
+
+      if (isNaN(x) || isNaN(y) || x < 0 || x > 100 || y < 0 || y > 100) {
+        alert("Please enter valid coordinates between 0 and 100.");
+        return;
+      }
+
+      // Convert the 0-100 coordinates to map pixel coordinates
+      const mapWidth = map.width;
+      const mapHeight = map.height;
+      const pixelX = (x / 100) * mapWidth;
+      const pixelY = (y / 100) * mapHeight;
+
+      // Show the guess marker
+      guessMarker.style.display = 'block';
+      guessMarker.style.position = 'absolute';
+      guessMarker.style.left = `${pixelX - 5}px`; // Center the marker
+      guessMarker.style.top = `${pixelY - 5}px`;
+
+      // Calculate the distance from the actual location in 0-100 range
+      const distance = Math.sqrt(
+        Math.pow(x - actualLocation.x, 2) + Math.pow(y - actualLocation.y, 2)
+      );
+
+      // Show the distance
+      distanceText.textContent = `Distance from the actual location: ${distance.toFixed(2)} (in 0-100 range)`;
+
+      // Calculate score (1000 is max score, decreases with distance)
+      let score = Math.max(1000 - distance * 10, 0); // scale the score
+      scoreText.textContent = `Your Score: ${Math.round(score)}`;
+    });
+  </script>
+
+</body>
+</html>
